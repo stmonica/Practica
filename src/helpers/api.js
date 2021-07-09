@@ -2,6 +2,8 @@ import { API_ROUTE } from "../config/api";
 import Category from "../models/category";
 import Product from "../models/product"
 
+
+
 const ApiClient = {
   get: (url, headers) => {
     return ApiClient.makeRequest(`${API_ROUTE}/${url}`, "GET", {}, headers);
@@ -11,11 +13,11 @@ const ApiClient = {
     return ApiClient.makeRequest(`${API_ROUTE}/${url}/${id}`, "GET", {}, headers);
 
   },
-  create: (url, category, headers) => {
+  post: (url, category, headers) => {
     return ApiClient.makeRequest(`${API_ROUTE}/${url}`, "POST", category, headers);
 
   },
-  update: (url, category, headers) => {
+  put: (url, category, headers) => {
     return ApiClient.makeRequest(`${API_ROUTE}/${url}`, "PUT", category, headers);
 
   },
@@ -44,6 +46,8 @@ const ApiClient = {
   },
 };
 
+
+
 const ProductCategories = {
   all: async () => {
     const { categories } = await ApiClient.get("category");
@@ -53,27 +57,27 @@ const ProductCategories = {
     );
   },
 
-  getById: async (category) => {
-    const varcategory  = await ApiClient.getById("category", category);
-    console.log(varcategory);
-    return new Category(varcategory.categoryId, varcategory.name, varcategory.description)
+  getById: async (id) => {
+    const  varcategory  = await ApiClient.get(`category/${id}`);
+    return varcategory;
   },
 
   create : async (category) => {
-    const varcategory = await ApiClient.create("category", category);
-    console.log(varcategory);
+    const varcategory = await ApiClient.post("category", category,{"Content-Type": "application/json"});
+    
     return new Category(varcategory.categoryId, varcategory.name, varcategory.description)
   },
 
-  update: async (category) => {
-    const varcategory = await ApiClient.update("category", category);
-    console.log(varcategory);
-    return new Category(varcategory.categoryId, varcategory.name, varcategory.description)
-  },
+  update: async (id, category) => {
+    const varcategory = await ApiClient.put(`category/${id}`, category,{"Content-Type": "application/json"});
+   
+    return varcategory;
+ },
   
-  delete: async (category) => {
-    const varcategory = await ApiClient.update("category", category);
-    console.log(varcategory);
+  
+  delete: async (id) => {
+     await ApiClient.delete(`category/${id}`,{"Content-Type": "application/json"});
+
   
   },
 };
@@ -85,7 +89,32 @@ const CategoryProducts = {
       (c) => new Product(c.productId, c.name, c.description, c.price, c.basePrice, c.categoryId, c.filename)
     );
   },
+
+  get: async (id) => {
+    const  products  = await ApiClient.get(`product/${id}`);
+    return products;
+  
+  },
+
+
+ create: async (category) => {
+    const  varproduct  = await ApiClient.post("product", category,{"Content-Type": "application/json"});
+    return new Product(varproduct.productId, varproduct.name, varproduct.description, varproduct.price, varproduct.basePrice, varproduct.categoryId, varproduct.filename)
+    
+  },
+
+ update: async (id, category) => {
+     await ApiClient.put(`product/${id}`, category,{"Content-Type": "application/json"});
+   
+    
+  },
+
+ delete: async (id) => {
+   await ApiClient.delete(`product/${id}`,{"Content-Type": "application/json"});
+    
+  },
 };
+
 
 const ApiHelper = {
   ProductCategories,
